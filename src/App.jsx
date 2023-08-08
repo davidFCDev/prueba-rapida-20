@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import "./App.css";
 import { Movies } from "./components/Movies";
-import responseMovies from "./mocks/with-results.json";
+import { useMovies } from "./hooks/useMovies";
 
 function useSearch() {
   const [search, updateSearch] = useState("");
@@ -31,10 +31,11 @@ function useSearch() {
 
 function App() {
   const { search, updateSearch, error } = useSearch();
+  const { movies, getMovies, loading } = useMovies({ search });
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Buscando", search);
+    getMovies({ search });
   };
 
   const handleChange = (event) => {
@@ -46,7 +47,7 @@ function App() {
     <div className="page">
       <header>
         <h1>Buscador de películas</h1>
-        <form onSubmit={handleSubmit}>
+        <form className="form" onSubmit={handleSubmit}>
           <input
             onChange={handleChange}
             value={search}
@@ -58,9 +59,7 @@ function App() {
         {error && <p style={{ color: "red" }}>{error}</p>}
       </header>
 
-      <main>
-        <Movies movies={mappedMovies} />
-      </main>
+      <main>{loading ? <p>Loading...</p> : <Movies movies={movies} />}</main>
     </div>
   );
 }
